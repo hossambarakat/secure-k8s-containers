@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: webapp
+    image: hossambarakat/k8s-security-webapp
+    imagePullPolicy: Always
+    securityContext:
+      privileged: true
+  #   volumeMounts:
+  #     - name: sec-vol
+  #       mountPath: "/sec-vol"
+  # volumes:
+  #   - name: sec-vol
+  #     hostPath:
+  #         path: "/"
+      # emptyDir: {}

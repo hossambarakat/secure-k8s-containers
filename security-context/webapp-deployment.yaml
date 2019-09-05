@@ -1,0 +1,48 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: webapp-deployment
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: hossambarakat/webapp:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        securityContext:
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          # privileged: true
+        volumeMounts:
+        - name: host-root
+          mountPath: "/hostroot"
+      volumes:
+      - name: host-root
+        hostPath:
+          # directory location on host
+          path: /
+          # this field is optional
+          type: Directory
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: webapp
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
