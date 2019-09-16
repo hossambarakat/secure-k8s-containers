@@ -16,17 +16,5 @@ spec:
         - name: web
           containerPort: 80
           protocol: TCP
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: my-service
-spec:
-  selector:
-    app: static-web
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8443
 EOF
 ```

@@ -7,13 +7,13 @@ spec:
   - name: webapp
     image: hossambarakat/k8s-security-webapp
     imagePullPolicy: Always
+    ports:
+        - containerPort: 3000
     securityContext:
       privileged: true
-  #   volumeMounts:
-  #     - name: sec-vol
-  #       mountPath: "/sec-vol"
-  # volumes:
-  #   - name: sec-vol
-  #     hostPath:
-  #         path: "/"
-      # emptyDir: {}
+    volumeMounts:
+      - name: sec-vol
+        mountPath: "/sec-vol"
+  volumes:
+    - name: sec-vol
+      emptyDir: {}
