@@ -57,10 +57,6 @@ now navigating to the directory `/tmp/host/var/lib/kubelet/pki` we can find the 
 
 Using the runAsUser parameter you can modify the user ID of the processes inside a container.
 
-### fsGroup => write file
-
-Any file you create inside the /data/demo volume will use GID 2000 (due to the fsGroup parameter).
-
 ### allowPrivilegeEscalation = false
 
 means the container cannot escalate privileges
@@ -81,3 +77,10 @@ echo "<img src=\"lack-of-security.jpg\" />" >> index.html
 
 
 kubectl get pods --client-certificate=kubelet.crt --client-key=kubelet.key
+
+Id
+amicontained
+change host name
+change file content
+mount so I can find the static pod path location
+mount to the hostroot and schedule a pod
