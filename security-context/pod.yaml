@@ -12,8 +12,9 @@ spec:
     securityContext:
       privileged: true
     volumeMounts:
-      - name: sec-vol
-        mountPath: "/sec-vol"
+        - name: host-root
+          mountPath: "/hostroot"
   volumes:
-    - name: sec-vol
-      emptyDir: {}
+  - name: host-root
+    hostPath:
+      path: /

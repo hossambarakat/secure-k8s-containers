@@ -1,18 +1,6 @@
 
 ## Deploy privileged container
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-  labels:
-    app: nginx
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-```
 ## Verify that root on container is root on host
 
 ssh into the node
@@ -78,9 +66,9 @@ echo "<img src=\"lack-of-security.jpg\" />" >> index.html
 
 kubectl get pods --client-certificate=kubelet.crt --client-key=kubelet.key
 
-Id
+Id 
+sleep ?? demo or somewhere in slides?
 amicontained
-change host name
 change file content
-mount so I can find the static pod path location
-mount to the hostroot and schedule a pod
+-----
+

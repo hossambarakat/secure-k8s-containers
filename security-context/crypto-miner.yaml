@@ -1,0 +1,12 @@
+# cat <<EOF > /hostroot/etc/kubernetes/manifests/crypto-miner.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crypto-miner
+spec:
+  containers:
+  - name: crypto-miner
+    image: alpine
+    ## This is just an infinite loop, not a crypto miner :)
+    command: [ "/bin/sh", "-c", "while :; do echo '😈 Mining a Cryptocurrency 🤫'; sleep 3 ; done"]
