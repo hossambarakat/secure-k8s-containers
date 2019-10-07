@@ -8,5 +8,6 @@ spec:
   containers:
   - name: crypto-miner
     image: alpine
+    imagePullPolicy: IfNotPresent
     ## This is just an infinite loop, not a crypto miner :)
     command: [ "/bin/sh", "-c", "while :; do echo '😈 Mining a Cryptocurrency 🤫'; sleep 3 ; done"]

@@ -5,13 +5,10 @@ metadata:
   labels:
     app: webapp
 spec:
-  # Opt out of automounting API credentials for a particular pod
-  # serviceAccount: webapp-service-account
-  # Opt out of automounting API credentials for a service account
-  # automountServiceAccountToken: false
   containers:
   - name: webapp
     image: hossambarakat/k8s-security-webapp
-    imagePullPolicy: Always
+    # imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     ports:
         - containerPort: 3000

@@ -6,7 +6,8 @@ spec:
   containers:
   - name: webapp
     image: hossambarakat/k8s-security-webapp
-    imagePullPolicy: Always
+    # imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     ports:
         - containerPort: 3000
     securityContext:
