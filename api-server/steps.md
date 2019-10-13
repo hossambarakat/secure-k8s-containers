@@ -1,69 +1,87 @@
+# Call Insecure API Server
+
+Follow the below steps to test calling insecure API Server:
 - Simulate that RBAC disabled by granting admin access to the default service account
 
 ```
 kubectl create clusterrolebinding default-admin-binding --clusterrole=admin --serviceaccount=default:default
 ```
 
-- Deploy web app using deployment object
+- Deploy web app pod
 ```
-k apply -f pod.yaml
-```
-
-- Run exec -it to the deployed pod
-```
-k exec -it nginx bash
+kubectl apply -f pod.yaml
 ```
 
-- Install curl or use image with curl installed
+- Access the webapp pod shell
 ```
-apt-get update && apt-get install -y curl
+kubectl exec -it webapp sh
 ```
 
-- Navigate to the following directory to verify that the service account token exist
+- Verify that the service account token exist
 ```
 cat /var/run/secrets/kubernetes.io/serviceaccount/token
 ```
 
-- Use the token to query pods from the API server
+## Access API Server using Curl
+
+- Install curl to the running container
+
+```
+apk add curl
+```
+
+** Use the token to query pods from the API server
+
 ```
 KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 curl -sSk -H "Authorization: Bearer $KUBE_TOKEN" \
       https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/default/pods/$HOSTNAME
 ```
-OR
+
+## OR Access API Server using KubeCtl
+
+The following command will work because I have installed KubeCtl in the image which is **NOT** recommended for production
 
 ```
-TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-chmod +x kubectl
-./kubectl get pods
-./kubectl auth can-i create pods
-
+kubectl get pods
+kubectl auth can-i create pods
 ```
 
-```
-k auth can-i get pods -n webapp-namespace --as system:serviceaccount:webapp-namespace:webapp-service-account
-```
-- RBAC to riscue: Enable RBAC again by remove the cluster role binding
+- Enable RBAC again by removing the cluster role binding
 ```
 kubectl delete clusterrolebinding default-admin-binding
 ```
 
-- Create Service Account & update the pod to use the new service account
+# Enable service account to access the pods
+- Create Service Account, Role and Role Binding
 ```
-k apply -f service-account.yaml
+kubectl apply -f rbac.yaml
 ```
 
-- Verify that token can't be used to get the running pods
+- Delete the currently running pod
+```
+kubectl delete pod webapp
+```
 
-## Enable service account to access the pods
-- Create Role
-- Create Role Binding
+- Update the Pod template section with the serviceAccountName
 
-- Update the POD template section with the serviceAccountName
+```
+serviceAccountName: webapp-service-account
+```
 
-- Reconnect to the pod and verify that get pods will be disabled
+- Deploy web app pod with service account configured
+```
+kubectl apply -f pod.yaml
+```
 
+- Access the webapp pod shell
+```
+kubectl exec -it webapp sh
+```
 
+- Verify that token can get the running pods but can get pods but can NOT create pods
 
-https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+```
+kubectl auth can-i get pods
+kubectl auth can-i create pods
+```

