@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+spec:
+  containers:
+  - name: webapp
+    image: hossambarakat/k8s-security-webapp
+    # imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
+    ports:
+        - containerPort: 3000

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: webapp
+    image: hossambarakat/k8s-security-webapp
+    # imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
+    ports:
+        - containerPort: 3000
+    securityContext:
+      privileged: true
+    volumeMounts:
+        - name: host-root
+          mountPath: "/hostroot"
+  volumes:
+  - name: host-root
+    hostPath:
+      path: /
